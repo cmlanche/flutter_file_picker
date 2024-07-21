@@ -166,7 +166,19 @@ public class FilePickerDelegate implements PluginRegistry.ActivityResultListener
                                 return;
                             }
 
-                            final FileInfo file = FileUtils.openFileStream(FilePickerDelegate.this.activity, uri, loadDataToMemory);
+                            FileInfo file;
+                            String realPath = FileUtils.getRealPathFromURI(FilePickerDelegate.this.activity, uri);
+                            if (realPath != null) {
+                                final FileInfo.Builder fileInfo = new FileInfo.Builder();
+                                final String fileName = FileUtils.getFileName(uri, FilePickerDelegate.this.activity);
+                                fileInfo.withName(fileName);
+                                fileInfo.withUri(uri);
+                                fileInfo.withPath(realPath);
+                                fileInfo.withSize(new File(realPath).length());
+                                file = fileInfo.build();
+                            } else {
+                                file = FileUtils.openFileStream(FilePickerDelegate.this.activity, uri, loadDataToMemory);
+                            }
 
                             if(file != null) {
                                 files.add(file);
